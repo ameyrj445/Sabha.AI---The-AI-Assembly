@@ -55,14 +55,14 @@ def get_cached_response(question: str) -> dict | None:
         try:
             cached = redis_client.get(cache_key)
             if cached:
-                print(f"📦 Redis cache hit for: {cache_key[:30]}...")
+                print(f" Redis cache hit for: {cache_key[:30]}...")
                 return json.loads(cached)
         except Exception as e:
             print(f"Redis get error: {e}")
     
     # Fall back to memory cache
     if cache_key in _memory_cache:
-        print(f"📦 Memory cache hit for: {cache_key[:30]}...")
+        print(f" Memory cache hit for: {cache_key[:30]}...")
         return _memory_cache[cache_key]
     
     return None
@@ -91,14 +91,14 @@ def cache_response(question: str, response: dict, ttl: int = 3600) -> bool:
     if redis_client:
         try:
             redis_client.setex(cache_key, ttl, json.dumps(response))
-            print(f"💾 Cached to Redis: {cache_key[:30]}...")
+            print(f" Cached to Redis: {cache_key[:30]}...")
             return True
         except Exception as e:
             print(f"Redis set error: {e}")
     
     # Fall back to memory cache
     _memory_cache[cache_key] = response
-    print(f"💾 Cached to memory: {cache_key[:30]}...")
+    print(f" Cached to memory: {cache_key[:30]}...")
     return True
 
 

@@ -101,7 +101,6 @@ export default function Demo() {
     }
   };
 
-
   return (
     <div className="sabha-heritage-bg text-sabhaText">
       <div className="sabha-stage">
@@ -276,3 +275,4 @@ export default function Demo() {
     </div>
   );
 }
+

@@ -1,4 +1,4 @@
-# Sabha 🤖🗣️
+# Sabha - THE AI ASSEMBLY
 
 **Sabha** is a multi-LLM discussion system built as a Reddit-style conversation app.
 
