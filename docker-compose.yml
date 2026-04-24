@@ -1,0 +1,62 @@
+version: "3.8"
+
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./sabha-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    env_file:
+      - path: ./sabha-backend/.env
+        required: false
+    depends_on:
+      - redis
+    volumes:
+      - db_data:/app/data
+    restart: unless-stopped
+
+  celery:
+    build:
+      context: ./sabha-backend
+    command: celery -A core worker -l INFO
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    env_file:
+      - path: ./sabha-backend/.env
+        required: false
+    depends_on:
+      - redis
+      - backend
+    volumes:
+      - db_data:/app/data
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./sabha-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  redis_data:
+  db_data:
