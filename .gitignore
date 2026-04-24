@@ -1,9 +1,48 @@
-
+# Python
 *.pyc
 __pycache__/
-.env
+.pytest_cache/
+.python-version
+venv/
+.venv/
+**/venv/
+**/.venv/
+
+# Django
+*.log
+*.pot
+*.py[cod]
+*$py.class
 db.sqlite3
+**/db.sqlite3
+media/
+staticfiles/
+
+# Local environment files
+.env
+.env.*
+
+# Virtual environments
+sabha/sabha/
+
+# Node / frontend
+node_modules/
+dist/
+build/
+.vite/
+
+# IDEs and editors
 .DS_Store
 .idea/
-.venv/
-node_modules/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# Docker
+*.env.*
+
+# Misc
+*.swp
+*~
