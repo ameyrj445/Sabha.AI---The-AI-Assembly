@@ -1,136 +1,194 @@
 # Sabha 🤖🗣️
-**Sabha** is a multi-LLM discussion system for Reddit-style conversations.  
-Frontend is **React + Vite**, backend is **Python + Django**
+
+**Sabha** is a multi-LLM discussion system built as a Reddit-style conversation app.
+
+- Frontend: React + Vite
+- Backend: Python + Django
+- API: Django REST Framework
+- Background tasks: Celery + Redis
 
 ---
 
-## Tech Stack
+## Repository Structure
 
-### Frontend
-- React
-- Vite
-- Fetch/Axios (API calls)
-
-### Backend
-- Python
-- Django
-- Django REST Framework (recommended)
-
-### DevOps / Hosting
-- Frontend: Vercel
-- Backend: Render
+- `sabha-backend/` — Django backend project
+- `sabha-frontend/` — React + Vite frontend
+- `docker-compose.yml` — local stack with backend, frontend, Redis, and Celery
+- `Makefile` — common Docker-based development commands
 
 ---
 
-## Features (WIP)
-- Multi-LLM discussion threads
-- Post + comment style UI
-- API-based conversation runs
-- Configurable agents/models
-
----
-
-## Local Development
-
-### Prerequisites
+## Prerequisites
 
 - Docker and Docker Compose
-- Make (optional but recommended)
+- `make` (optional, but recommended)
+- Node.js and npm/yarn (for frontend local development)
+- Python 3.11+ (for backend local development)
+- Redis (for Celery if running backend locally without Docker)
 
-### Quick start
+---
+
+## Quick Start (Docker)
+
+From the repository root:
 
 ```bash
 cp sabha-backend/.env.example sabha-backend/.env
 make dev-all
 ```
 
-This will start:
+This starts:
 
-- `backend` (Django + DRF) on port `8000`
-- `frontend` (Vite / Nginx) on port `80`
-- `redis` and `celery` worker for async tasks
+- `backend` on `http://localhost:8000`
+- `frontend` on `http://localhost`
+- `redis`
+- `celery` worker
 
-You can also run only the backend stack:
+### Alternative Docker commands
+
+- Start backend + worker + Redis only:
 
 ```bash
 make dev-backend
 ```
 
-Then run the frontend locally with Vite (from `sabha-frontend`).
+- Start frontend only:
 
-### Management commands
+```bash
+make dev-frontend
+```
 
-- **Apply migrations**: `make migrate`
-- **Create admin user**: `make createsuperuser`
-- **Django shell**: `make shell`
+- Apply backend migrations:
 
-Environment variables for the backend are documented in `sabha-backend/.env.example`.
+```bash
+make migrate
+```
+
+- Create a Django admin user:
+
+```bash
+make createsuperuser
+```
+
+- Open Django shell:
+
+```bash
+make shell
+```
+
+---
+
+## Backend Local Development
+
+If you want to run the backend without Docker:
+
+1. Activate Python virtual environment:
+
+```powershell
+cd sabha-backend
+..\sabha\Scripts\activate
+```
+
+2. Install dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+3. Copy environment file:
+
+```bash
+cp .env.example .env
+```
+
+4. Apply migrations:
+
+```bash
+python manage.py migrate
+```
+
+5. Start the development server:
+
+```bash
+python manage.py runserver
+```
+
+The backend will be available at `http://127.0.0.1:8000`.
+
+> If local Celery is required, start Redis separately and run:
+>
+> ```bash
+> celery -A core worker -l INFO
+> ```
+
+---
+
+## Frontend Local Development
+
+From `sabha-frontend/`:
+
+```bash
+npm install
+npm run dev
+```
+
+Then open the URL shown by Vite (usually `http://localhost:5173`).
+
+If the backend is running locally, update the frontend API base URL as needed in `sabha-frontend/src/services/api.js`.
+
+---
+
+## Backend Environment Variables
+
+The backend environment variables are documented in `sabha-backend/.env.example`.
+
+Important values include:
+
+- `DJANGO_SECRET_KEY`
+- `DEBUG`
+- `ALLOWED_HOSTS`
+- `REDIS_URL`
+- `CELERY_BROKER_URL`
+- `CELERY_RESULT_BACKEND`
+- optional LLM provider keys such as `OPENROUTER_API_KEY`, `GEMINI_API_KEY`, and `DEEPSEEK_API_KEY`
 
 ---
 
 ## Backend API Overview
 
-Base URL (backend): `/api/`  
-Versioned alias (same behavior): `/api/v1/`
+Base URL: `http://localhost:8000/api/`
 
 ### Agents
 
-- **List agents**
-  - **Method**: `GET`
-  - **Path**: `/api/agents/`
-  - **Description**: Returns active Sabha agents with basic fields.
-  - **Response (per item)**: `id`, `name`, `role`, `tone`, `llm_provider`, `llm_model`, `is_active`, `order`
-
-- **Retrieve agent (detailed)**
-  - **Method**: `GET`
-  - **Path**: `/api/agents/{id}/`
-  - **Description**: Returns full agent configuration (detailed serializer).
+- `GET /api/agents/` — list active agents
+- `GET /api/agents/{id}/` — agent detail
 
 ### Sessions
 
-- **List sessions**
-  - **Method**: `GET`
-  - **Path**: `/api/sessions/`
-  - **Description**: List sessions with lightweight info.
-  - **Response (per item)**: `id`, `title`, `topic`, `status`, `message_count`, `created_at`, `updated_at`
-
-- **Create session**
-  - **Method**: `POST`
-  - **Path**: `/api/sessions/`
-  - **Body**: `{ "title": "...", "topic": "..." }`
-  - **Description**: Creates a new session.
-
-- **Retrieve session (with messages)**
-  - **Method**: `GET`
-  - **Path**: `/api/sessions/{id}/`
-  - **Description**: Full session detail including messages and consensus when available.
-
-- **Post message and trigger council**
-  - **Method**: `POST`
-  - **Path**: `/api/sessions/{id}/messages/`
-  - **Body**: `{ "content": "Your question here" }`
-  - **Description**: Adds a user message to the session and runs the council synchronously, returning the updated session payload.
+- `GET /api/sessions/` — list sessions
+- `POST /api/sessions/` — create a session
+- `GET /api/sessions/{id}/` — retrieve session with messages
+- `POST /api/sessions/{id}/messages/` — add a message and trigger council processing
 
 ### Messages
 
-- **List messages**
-  - **Method**: `GET`
-  - **Path**: `/api/messages/`
-  - **Query params**: `?session={session_id}` (optional filter)
-  - **Description**: Read-only access to messages, optionally filtered by session.
+- `GET /api/messages/?session={session_id}` — list messages, optionally filtered by session
 
-### Demo mode
+### Demo
 
-- **Get demo questions**
-  - **Method**: `GET`
-  - **Path**: `/api/demo/questions/`
-  - **Description**: Returns a list of canned demo questions you can rotate through in the frontend for a hands-off demo mode.
+- `GET /api/demo/questions/` — fetch sample demo questions
 
-### API Schema & Docs
+### API docs
 
-- **OpenAPI schema**: `GET /api/schema/`
-- **Browsable docs**: `GET /api/docs/`
+- `GET /api/schema/`
+- `GET /api/docs/`
 
-Both `/api/` and `/api/v1/` expose the same resources to keep things non-breaking while introducing versioning.
+---
+
+## Notes
+
+- The repository uses Docker Compose to simplify running the full stack.
+- If you use Docker, the `Makefile` wraps common commands.
+- For local backend development, Redis is required for Celery and can be started independently.
 
 ---
