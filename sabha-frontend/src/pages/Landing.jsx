@@ -147,7 +147,7 @@ export default function Landing() {
           </Section>
 
           <footer className="pt-3 text-center text-[0.8rem] text-[#8b6d57] sabha-reveal" style={{ animationDelay: "520ms" }}>
-            © {new Date().getFullYear()} Sabha · सभासदां बुद्धिसंग्रहः
+            © {new Date().getFullYear()} Sabha.AI · सभासदां बुद्धिसंग्रहः
           </footer>
           </main>
         </div>
