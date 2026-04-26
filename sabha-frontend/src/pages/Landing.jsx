@@ -208,5 +208,3 @@ function ArchStep({ chip, title, body, delay = 0 }) {
     </div>
   );
 }
-
-

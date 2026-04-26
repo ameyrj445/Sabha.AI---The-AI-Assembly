@@ -5,7 +5,6 @@ Django REST Framework Serializers for Sabha API
 from rest_framework import serializers
 from debate.models import Agent, Session, Message, ReasoningEntry
 
-
 class AgentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Agent
@@ -25,7 +24,6 @@ class ReasoningEntrySerializer(serializers.ModelSerializer):
         model = ReasoningEntry
         fields = ['id', 'agent_name', 'phase', 'rationale', 'confidence', 'created_at']
 
-
 class MessageSerializer(serializers.ModelSerializer):
     reasoning = ReasoningEntrySerializer(
         source='session.reasoning',
@@ -36,7 +34,6 @@ class MessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Message
         fields = ['id', 'role', 'agent_name', 'phase', 'content', 'created_at', 'reasoning']
-
 
 class SessionListSerializer(serializers.ModelSerializer):
     message_count = serializers.SerializerMethodField()
