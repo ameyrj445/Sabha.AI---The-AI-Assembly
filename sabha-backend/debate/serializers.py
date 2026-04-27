@@ -97,4 +97,3 @@ class DebateRequestSerializer(serializers.Serializer):
         attrs['title'] = (attrs.get('title') or 'Sabha Debate').strip() or 'Sabha Debate'
         attrs['topic'] = topic or prompt
         return attrs
-
