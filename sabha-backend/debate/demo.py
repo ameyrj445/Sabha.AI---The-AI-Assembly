@@ -15,4 +15,3 @@ def get_demo_questions():
     needing to hardcode strings client-side.
     """
     return DEMO_QUESTIONS
-
