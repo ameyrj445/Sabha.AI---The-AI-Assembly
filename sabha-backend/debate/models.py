@@ -66,4 +66,3 @@ class ReasoningEntry(models.Model):
 
     def __str__(self):
         return f"{self.agent.name} - {self.phase}"
-
