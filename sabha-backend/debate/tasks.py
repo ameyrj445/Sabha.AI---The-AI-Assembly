@@ -44,3 +44,4 @@ def run_council_async(self, session_id: int, user_message: str):
         session.consensus = f"Error during deliberation: {str(e)}"
         session.save()
         raise
+
